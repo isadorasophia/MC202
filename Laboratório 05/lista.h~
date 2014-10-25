@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Simulacao de tipos booleanos */
 typedef enum {
     false = 0,
     true = 1

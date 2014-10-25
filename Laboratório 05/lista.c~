@@ -2,10 +2,10 @@
 
 /* Insere o no "p" ao fim da lista */
 void addNo (No *no, No *p) {
-    while (no->next != NULL)
-        no = no->next;
+    while (p->next != NULL)
+        p = p->next;
     
-    no->next = p;
+    p->next = p;
 }
 
 /* Remove o proximo no */

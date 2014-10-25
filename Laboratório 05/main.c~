@@ -12,9 +12,9 @@ int main () {
     
     scanf("%d", &N);
     
-    /* Executa enquanto o disco for valido */
+    // Executa enquanto o disco for valido
     while (N) {
-        /* Realiza as operacoes no disco */
+        // Realiza as operacoes no disco
         gerenciaDisco(N);
 
         scanf("%d", &N);
