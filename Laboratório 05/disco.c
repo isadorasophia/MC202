@@ -3,12 +3,10 @@
 #define MAX_OPERACAO 10
 #define NUM_BLOCOS 8
 
-//TODO: Nao usar malloc como arquivo = malloc (sizeof (arquivo))...
-
 /* Prototipo de funcoes necessarias para a implementacao da biblioteca */
 long int converteTipo(long int valor, char tipo);
 char statusBloco(BlocoMem p, long int size);
-int fillDisk(BlocoMem diskStatus[], long int size, No *files);
+Bool fillDisk(BlocoMem diskStatus[], long int size, No *files);
 Bool distribuiFiles(BlocoMem diskStatus[], long int size, No *files,
                     Bool *otimizado);
 No *findPos (No *files, long int size);
@@ -18,6 +16,7 @@ void gerenciaDisco(int quant) {
     int i;
     long int size;
     char type, *operacao;
+    Bool ok = true;
     No *files;
     BlocoMem diskStatus[NUM_BLOCOS];
     
@@ -48,13 +47,17 @@ void gerenciaDisco(int quant) {
         else if (strcmp(operacao, "otimiza") == 0)
             otimizaFile(files);
         
+        /* Checa se os arquivos podem ser apropriadamente preenchidos 
+         * no disco */
+        if (ok)
+            ok = fillDisk(diskStatus, size, files);
+        
         free (operacao);
     }
     
-    /* Preenche os blocos que indicam o estado do disco - 
-     * imprime caso a operacao tenha sido realizada com sucesso (1) ou 
-     * fracassado (0) */
-    if (fillDisk(diskStatus, size, files))
+    /* Imprime o estado final do disco, caso este tenha sido adequadamente
+     * preenchido */
+    if (ok)
         for (i = 0; i < NUM_BLOCOS; i++)
             printf("[%c]", diskStatus[i].status);
     else
@@ -78,20 +81,20 @@ long int converteTipo(long int valor, char tipo) {
             break;
         case 'G':
             fatorCorrecao = Gb;
-            break;
     }
     
     return valor * fatorCorrecao;
 }
 
-/* Preenche o disco: retorna 1 caso tenha sido realizado com sucesso, 0 caso
- * contrario */
-int fillDisk(BlocoMem diskStatus[], long int size, No *files) {
+/* Preenche o disco e retorna se a operacao foi realizada com sucesso */
+Bool fillDisk(BlocoMem diskStatus[], long int size, No *files) {
     int i;
     Bool otimizado = false, canGo = true, success = false;
     No *head = files;
     
     while (canGo && !success) {
+        /* Caso o arquivo ja tenha sido otimizado, nao repete mais a
+         * verificacao */
         if (otimizado)
             canGo = false;
         
@@ -104,8 +107,7 @@ int fillDisk(BlocoMem diskStatus[], long int size, No *files) {
         
         files = head;
         
-        /* Inicializa os valores necessarios para a implementacao 
-         * do algoritmo */
+        /* Inicializa os valores necessarios para a distribuicao dos arquivos */
         while (files->next != NULL) {
             files->next->sizeNotLocated = files->next->size;
             files = files->next;
@@ -118,8 +120,8 @@ int fillDisk(BlocoMem diskStatus[], long int size, No *files) {
     return success;
 }
 
-/* Distribui os arquivos contidos em files nas celulas do disco, retorna se a
- * operacao foi realizada com sucesso ou nao */
+/* Distribui os arquivos nas celulas do disco, retorna se a operacao foi
+ * realizada com sucesso e se foi necessaria a otimizacao */
 Bool distribuiFiles(BlocoMem diskStatus[], long int size, No *files,
     Bool *otimizado) {
     int i = 0;
@@ -127,10 +129,6 @@ Bool distribuiFiles(BlocoMem diskStatus[], long int size, No *files,
 
     /* Enquanto ainda houver arquivos ou blocos a percorrer */
     while (i < NUM_BLOCOS && files->next != NULL) {
-//      printf("\n file size: %ld | file name: %s | disk size: %ld | disk
-//              useful size: %ld | number: %d", files->next->sizeNotLocated,
-//              files->next, diskStatus[i].totalMemoria,
-//              diskStatus[i].memoriaOcupada, i);
         /* Caso o arquivo caiba no bloco */
         if (diskStatus[i].totalMemoria + files->next->sizeNotLocated <= size) {
             /* Acrescenta memoria do arquivo no bloco */
@@ -168,13 +166,13 @@ Bool distribuiFiles(BlocoMem diskStatus[], long int size, No *files,
         }
     }
     
-    /* Finalmente, computa o estado de cada bloco do disco */
-    for (i = 0; i < NUM_BLOCOS; i++)
-        diskStatus[i].status = statusBloco(diskStatus[i], size);
-    
-    /* Caso todos os arquivos tenham sido alocados, indica sucesso */
-    if (files->next == NULL)
+    /* Caso todos os arquivos tenham sido todos alocados, computa o estado 
+     * de cada bloco do disco e indica sucesso */
+    if (files->next == NULL) {
+        for (i = 0; i < NUM_BLOCOS; i++)
+            diskStatus[i].status = statusBloco(diskStatus[i], size);
         return true;
+    }
     
     /* Caso o arquivo nao tenha sido otimizado, os blocos foram todos
      * coordenados e ha arquivos ainda nao alocados, otimiza-os! */
@@ -221,7 +219,7 @@ void insereFile(No *files) {
      * nome solicitado */
     p = findNo(name, files);
     
-    /* Caso o nome exista, apenas acrescenta a este arquivo */
+    /* Caso o nome exista, apenas acrescenta memoria a este arquivo */
     if (p != NULL && p->ocupado) {
         p->size += sizeNo;
         return;
@@ -237,13 +235,13 @@ void insereFile(No *files) {
     /* Encontra a posicao mais apropriada para a alocar o no */
     files = findPos (files, sizeNo);
     
-    /* Finalmente, adiciona o no para a posicao mais apropriada */
+    /* Finalmente, adiciona o no na posicao mais apropriada */
     addNext(files, p);
 }
 
 /* Retorna a posicao valida para a alocao de um novo no mais proxima do 
  * inicio do disco */
-No *findPos (No *files, long int size) {
+No *findPos (No *files, long int sizeNo) {
     long int sizeLivre = 0;
     Bool found = false;
     No *toEncaixar = NULL;
@@ -255,7 +253,7 @@ No *findPos (No *files, long int size) {
             if (sizeLivre == 0)
                 toEncaixar = files;
             
-            /* Espaco desocupado, sujeito a alocal do no */
+            /* Espaco desocupado, sujeito a alocacao do no */
             sizeLivre += files->next->size;
         }
         /* Espaco ocupado, reinicia qualquer estudo de espaco desocupado */
@@ -265,23 +263,23 @@ No *findPos (No *files, long int size) {
         
         /* Caso haja espaco livre suficiente para alocar o no e este seja
          * valido */
-        if (sizeLivre >= size && toEncaixar != NULL) {
+        if (sizeLivre >= sizeNo && toEncaixar != NULL) {
             found = true;
             files = toEncaixar;
             
             /* Enquanto nao estiver no fim da lista e o proximo arquivo for
              * desocupado, remove este espaco para o no ser alocado */
             while (files->next != NULL && files->next->ocupado == false) {
-                /* Caso o tamanho nao seja suficiente para o no, avanca para
-                 * os proximos rquivos desocupados */
-                if (files->next->size <= size) {
-                    size -= files->next->size;
+                /* Caso o tamanho nao seja suficiente para o no, remove-o e
+                 * avanca para o proximo arquivo desocupado */
+                if (files->next->size <= sizeNo) {
+                    sizeNo -= files->next->size;
                     removeNext(files);
                 } 
                 /* ...ou caso seja necessario remover apenas parte da memoria
                  * do arquivo desocupado */
                 else {
-                    files->next->size -= size;
+                    files->next->size -= sizeNo;
                     
                     /* Finaliza o processo de remocao de memoria */
                     break;
@@ -318,7 +316,7 @@ void removeFile(No *t) {
 /* Otimiza o disco */
 void otimizaFile(No *t) {
     while (t->next != NULL) {
-        /* Caso o arquivo esteja desocupado, o remove */
+        /* Caso o arquivo esteja desocupado, remove-o */
         if (t->next->ocupado == false) {
             removeNext(t);
         } else

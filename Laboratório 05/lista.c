@@ -6,7 +6,7 @@ void addNext (No *no, No *p) {
     no->next = p;
 }
 
-/* Remove o proximo no */
+/* Remove o no posterior a "p" */
 void removeNext (No *p) {
     No *q;
     

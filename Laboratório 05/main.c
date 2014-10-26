@@ -1,6 +1,6 @@
 /* Isadora Sophia Garcia Rodopoulos
  * RA: 158018
- * MC202B - LAB05 */
+ * MC202B - LAB05 - Gerente do espaco */
 
 #include <stdio.h>
 #include <stdlib.h>

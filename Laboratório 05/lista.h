@@ -21,7 +21,7 @@ typedef struct No {
 /* Insere o no "p" apos o no recebido */
 void addNext (No *no, No *p);
 
-/* Remove o proximo no */
+/* Remove o no posterior a "p" */
 void removeNext (No *no);
 
 /* Retorna o no com o nome correspondente, NULL caso nao exista */
