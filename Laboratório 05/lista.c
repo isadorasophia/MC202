@@ -1,10 +1,8 @@
 #include "lista.h"
 
-/* Insere o no "p" ao fim da lista */
-void addNo (No *no, No *p) {
-    while (no->next != NULL)
-        no = no->next;
-    
+/* Insere o no "p" apos o no recebido */
+void addNext (No *no, No *p) {
+    p->next = no->next;
     no->next = p;
 }
 

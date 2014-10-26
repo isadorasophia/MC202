@@ -13,12 +13,13 @@ typedef enum {
 typedef struct No {
     char name[11];
     long int size;
+    long int sizeNotLocated;
     Bool ocupado;
     struct No *next;
 } No;
 
-/* Insere o no "p" ao fim da lista */
-void addNo (No *no, No *p);
+/* Insere o no "p" apos o no recebido */
+void addNext (No *no, No *p);
 
 /* Remove o proximo no */
 void removeNext (No *no);
