@@ -5,11 +5,17 @@
 
 /* Prototipo de funcoes necessarias para a implementacao da biblioteca */
 long int converteTipo(long int valor, char tipo);
-char statusBloco(BlocoMem p, long int size);
+
 Bool fillDisk(BlocoMem diskStatus[], long int size, No *files);
 Bool distribuiFiles(BlocoMem diskStatus[], long int size, No *files,
                     Bool *otimizado);
+char statusBloco(BlocoMem p, long int size);
+
+void insereFile(No *files);
 No *findPos (No *files, long int size);
+
+void otimizaFile(No *t);
+void removeFile(No *t);
 
 /* Gerencia operacoes e imprime estado do disco */
 void gerenciaDisco(int quant) {

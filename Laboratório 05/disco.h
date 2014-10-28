@@ -17,12 +17,3 @@ typedef struct BlocoMem {
 
 /* Gerencia operacoes e imprime estado do disco */
 void gerenciaDisco(int quant);
-
-/* Insere arquivo no disco */
-void insereFile(No *t);
-
-/* Remove um arquivo especifico no disco */
-void removeFile(No *t);
-
-/* Otimiza o disco */
-void otimizaFile(No *t);
