@@ -1,6 +1,7 @@
 /* Isadora Sophia Garcia Rodopoulos
  * RA: 158018
- * MC202B - LAB06 - Pre, in e pos */
+ * MC202B - LAB06 - Pre, in e pos
+ * A Partir de uma sequencia in-ordem e pos-ordem, imprime pre-ordem */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +9,7 @@
 #define NOT_FOUND -1
 
 /* Prototipos de funcao */
-void imprimePos(char *preOrdem, char *inOrdem, int tam);
+void imprimePre(char *posOrdem, char *inOrdem, int tam);
 int find (char key, char *vet, int tam);
 
 int main () {
@@ -26,8 +27,8 @@ int main () {
         
         scanf("%s %s", s1, s2);
         
-        /* Imprime a sequencia pos-ordem da arvore */
-        imprimePos(s1, s2, N);
+        /* Imprime a sequencia pre-ordem da arvore */
+        imprimePre(s1, s2, N);
         printf("\n");
         
         free(s1);
@@ -37,29 +38,28 @@ int main () {
     return 0;
 }
 
-/* A partir de pre-ordem e in-ordem, imprime a sequencia pos-ordem */
-void imprimePos(char *preOrdem, char *inOrdem, int tam) {
+/* A partir de pos-ordem e in-ordem, imprime a sequencia pre-ordem */
+void imprimePre(char *posOrdem, char *inOrdem, int tam) {
     int indexRaiz;
     
-    /* Encontra o endereco da raiz (sendo esta o primeiro elemento da pre-ordem)
+    /* Encontra o endereco da raiz (sendo esta o ultimo elemento da pos-ordem)
      * na sequencia in-ordem */
-    indexRaiz = find(preOrdem[0], inOrdem, tam);
+    indexRaiz = find(posOrdem[tam - 1], inOrdem, tam);
     
     if (indexRaiz == NOT_FOUND)
         return;
     
+    /* Imprime a raiz ou a folha antes de percorrer as possiveis subarvores */
+    printf("%c", posOrdem[tam - 1]);
+    
     /* Percorre a subarvore esquerda, se houver subarvore esquerda */
     if (indexRaiz != 0)
-        imprimePos (preOrdem + 1, inOrdem, indexRaiz);
+        imprimePre (posOrdem, inOrdem, indexRaiz);
     
     /* Percorre a subarvore direita, se houver subarvore direita */
     if (indexRaiz != tam - 1)
-        imprimePos (preOrdem + indexRaiz + 1, inOrdem + indexRaiz + 1, 
+        imprimePre (posOrdem + indexRaiz, inOrdem + indexRaiz + 1,
                     tam - indexRaiz - 1);
-        
-    /* Apos percorridas as subarvores na ordem apropriada, 
-     * imprime a raiz (ou a folha) na sequencia */
-    printf("%c", preOrdem[0]);
 }
 
 /* Retorna o endereco de dado elemento em "vet" */
