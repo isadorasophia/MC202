@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define NOT_FOUND -1
+
 /* Prototipos de funcao */
 void imprimePos(char *preOrdem, char *inOrdem, int tam);
 int find (char key, char *vet, int tam);
@@ -15,7 +17,7 @@ int main () {
     
     scanf ("%d", &C);
     
-    /* Enquanto houver arvores a serem lidas */
+    /* Enquanto houverem arvores a serem lidas */
     while (C--) {
         scanf("%d", &N);
         
@@ -24,6 +26,7 @@ int main () {
         
         scanf("%s %s", s1, s2);
         
+        /* Imprime a sequencia pos-ordem da arvore */
         imprimePos(s1, s2, N);
         printf("\n");
         
@@ -38,9 +41,12 @@ int main () {
 void imprimePos(char *preOrdem, char *inOrdem, int tam) {
     int indexRaiz;
     
-    /* Encontra o endereco da raiz (o primeiro elemento de pre-ordem)
+    /* Encontra o endereco da raiz (sendo esta o primeiro elemento da pre-ordem)
      * na sequencia in-ordem */
     indexRaiz = find(preOrdem[0], inOrdem, tam);
+    
+    if (indexRaiz == NOT_FOUND)
+        return;
     
     /* Percorre a subarvore esquerda, se houver subarvore esquerda */
     if (indexRaiz != 0)
@@ -51,6 +57,8 @@ void imprimePos(char *preOrdem, char *inOrdem, int tam) {
         imprimePos (preOrdem + indexRaiz + 1, inOrdem + indexRaiz + 1, 
                     tam - indexRaiz - 1);
         
+    /* Apos percorridas as subarvores na ordem apropriada, 
+     * imprime a raiz (ou a folha) na sequencia */
     printf("%c", preOrdem[0]);
 }
 
@@ -62,4 +70,7 @@ int find (char key, char *vet, int tam) {
         if (vet[i] == key)
             return i;
     }
+    
+    /* Caso nao encontre o elemento no vetor */
+    return NOT_FOUND;
 }
