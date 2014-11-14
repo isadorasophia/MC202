@@ -5,7 +5,7 @@
 int main () {
     int u, n, i;
     char elemChar;
-    ListNode *S = createListNode(NULL), *R = NULL;
+    ListNode *S = createListNode(NULL), *R = createListNode(NULL), *aux;
     TreeNode *U = NULL;
     
     scanf("%d %d", &u, &n);
@@ -19,18 +19,21 @@ int main () {
     getchar ();
     
     /* Realiza a leitura da colecao S de subconjuntos */
-    for (i = 1; i <= n; i++) {
-        S->next = leConjunto(i);
+    for (i = 1, aux = S->next; i <= n; i++) {
+        aux->next = leConjunto(i);
         
-        S = S->next;
+        aux = aux->next;
     }
     
-    if (guloso(&R, U, S) && !R) {
-        while (!R) {
-            R = R->next
+    if (guloso(R, U, S)) {
+        while (R->next) {
+            aux = R;
+            R = R->next;
+            free(aux);
+            
             printf("S%d ", R->order);
         
-            if (R)
+            if (R->next)
                 printf("U ");
             else
                 printf(":)\n");
