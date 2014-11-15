@@ -1,5 +1,7 @@
 #include "estruturas.h"
 
+#define NOT_FOUND 1
+
 TreeNode* createTreeNode (int n) {
     TreeNode *t;
     
@@ -110,16 +112,25 @@ TreeNode *RemoveRoot (TreeNode *r) {
 }
 
 int findNewRoot (TreeNode *r) {
+    /* Caso nao ha filhos, nao cabe a esta funcao determinar a nova raiz */
+    if (r->esq == NULL && r->dir == NULL)
+        return NOT_FOUND;
+    
     /* Caso nao haja esquerda, encontra o menor elemento da subarvore direita */
     if (r->esq == NULL) {
-    
-        
+        r = r->dir;
+        while (r)
+            r = r->dir;
     }   
     /* Caso haja apenas esquerda ou ambos, encontra o maior elemento da
      * esquerda */
-    else {
-        
+    else if (r->dir == NULL) {
+        r = r->esq;
+        while (r)
+            r = r->esq;
     }
+    
+    return r->elem;
        
 }
 
@@ -137,8 +148,21 @@ int buscaTree (TreeNode *r, int n) {
         buscaTree(r->dir, n);
 }
 
-TreeNode* afunilamentoTree (TreeNode *r, int n) {
+TreeNode* afunilamentoTree (TreeNode *r, int newR) {
+    TreeNode *n = r, *p = NULL, *a = NULL;
     
+    if (n == newR)
+        return r;
+   
+    /* TODO: recursao que recebe o newR a partir da chamada recursiva e realiza
+     * a rotacao conforme o pai e o avo */
+    a = p;
+    p = n;
+    if (newR > n->elem)
+        n = n->dir;
+    else if (newR < n->elem)
+        n = n->esq;
+    }
 }
 
 void freeTree (TreeNode *p) {
