@@ -1,4 +1,4 @@
-#include "cobertura.h"
+#include "estruturas.h"
 
-int castInt (char a);
-TreeNode* leConjunto (int order);
+ListNode* leConjunto (int order);
+int guloso(ListNode *R, TreeNode *U, ListNode *S);

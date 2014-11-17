@@ -1,27 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "cobertura.h"
 
 int main () {
     int u, n, i;
-    char elemChar;
-    ListNode *S = createListNode(NULL), *R = createListNode(NULL), *aux;
+    ListNode *S = createListNode(NULL, 0), *R = createListNode(NULL, 0), *aux;
     TreeNode *U = NULL;
     
     scanf("%d %d", &u, &n);
     
-    /* Inicia o universo U */
-    U = createTreeNode(1);
-    
-    for (i = 2; i <= u; i++)
-        insereTree(U, i);
-    
-    getchar ();
+    /* Inicia o universo U */    
+    for (i = 1; i <= u; i++)
+        U = insereTreeNode(U, i);
     
     /* Realiza a leitura da colecao S de subconjuntos */
-    for (i = 1, aux = S->next; i <= n; i++) {
-        aux->next = leConjunto(i);
+    for (i = 1, aux = S; i <= n; i++) {
+        /* Realiza a leitura do char "s" */
+        getchar ();
         
+        aux->next = leConjunto(i);
         aux = aux->next;
     }
     
