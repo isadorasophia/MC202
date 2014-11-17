@@ -1,8 +1,8 @@
 #include "estruturas.h"
 
 #define NOT_FOUND -1
-#define DEBUG 1
 
+/* Prototipos de funcoes auxiliares para a biblioteca */
 TreeNode *removeRoot (TreeNode *r);
 int findNewRoot (TreeNode *r);
 
@@ -10,6 +10,7 @@ TreeNode* afunilamento (TreeNode *r, int newR);
 TreeNode* RE (TreeNode *r);
 TreeNode* RD (TreeNode *r);
 
+#ifdef DEBUG
 void preOrder (TreeNode *r) {
     if (r == NULL)
         return;
@@ -18,8 +19,10 @@ void preOrder (TreeNode *r) {
     preOrder(r->esq);
     preOrder(r->dir);
 }
+#endif
 
-TreeNode* createTreeNode (int n) {
+/* Retorna um no de arvore */
+TreeNode* createTree (int n) {
     TreeNode *t;
     
     t = malloc(sizeof (TreeNode));
@@ -30,13 +33,15 @@ TreeNode* createTreeNode (int n) {
     return t;
 }
 
+/* Insere, com afunilamento, um elemento "n" em uma arvore de busca */
 TreeNode* insereTreeNode (TreeNode *r, int n) {
-    TreeNode *p, *f = r, *new = createTreeNode(n);
+    TreeNode *p, *f = r, *new = createTree(n);
     
+    /* Caso a arvore esteja vazia, retorna como raiz */
     if (!r)
         return new;
     
-    /* Encontra espaco mais adequado para alocao do novo no */
+    /* Encontra o espaco mais adequado para alocao do novo no */
     while (f) {
         p = f;
         
@@ -51,90 +56,77 @@ TreeNode* insereTreeNode (TreeNode *r, int n) {
     else
         p->dir = new;
     
+    /* Retorna o afunilamento da arvore em n */
     return afunilamento(r, n);
 }
 
+/* Remove, com afunilamento, um elemento "n" em uma arvore de busca */
 TreeNode* removeTreeNode (TreeNode *r, int n) {
     TreeNode *p, *f = r;
     int found = 0, newR;
     
-#ifdef DEBUG
-//    printf("Next step: removing the element %d\n", n);
-//    preOrder(r);
-#endif
+    /* Caso a arvore seja vazia */
+    if (r == NULL)
+        return r;
     
     /* Caso o elemento seja a raiz */
     if (r->elem == n) {
-#ifdef DEBUG
-//        printf("I am the root\n", n);
-#endif
-//        if (r->esq == NULL && r->dir == NULL)
-//            printf("ue\n");
         newR = findNewRoot(r);
         r = removeRoot(r);
-//        printf("The new root is %d\n", newR);
+
         return afunilamento(r, newR);
     }
     
     /* Encontra o pai do no a ser removido */
-    while (!found && f) {
-        if (n == f->elem)
+    while (!found && f != NULL) {
+        /* Caso tenha encontrado */
+        if (n == f->elem) {
             found = 1;
+        }
+        /* Caso o elemento esteja a esquerda */
         else if (n < f->elem) {
             p = f;
             f = f->esq;
         }
+        /* Ou a direita */
         else {
             p = f;
             f = f->dir;
         }
     }
     
+    /* Caso o elemento exista na arvore, remove-o e encontra candidato
+     * para o afunilamento */
     if (found) {
-#ifdef DEBUG
-//         printf("Element %d found\n", n);
-#endif
+        /* Caso ele esteja a esquerda */
         if (n < p->elem) {
             p->esq = removeRoot(p->esq);
-#ifdef DEBUG
-//             printf("Removed\n", n);
-//             preOrder(r);
-#endif
             newR = findNewRoot(p->esq);
-#ifdef DEBUG
-//             printf("New root found: %d\n", newR);
-#endif
         }
+        /* Ou a direita */
         else {
             p->dir = removeRoot(p->dir);
             newR = findNewRoot(p->dir);
         }
     }
     
-    if (!found || newR == NOT_FOUND) {
-#ifdef DEBUG
-//         if (!found)
-//             printf("I wasnt found\n", n);
-#endif
+    /* Caso nao tenha encontrado o elemento ou candidatos filhos para
+     * realizar o afunilamento */
+    if (!found || newR == NOT_FOUND)
         newR = p->elem;
-    }
 
-#ifdef DEBUG
-//     printf("Element %d removed\n", n);
-#endif
-    
-//     printf("new root is still %d\n", newR);
     return afunilamento(r, newR);
 }
 
+/* Remove a raiz de uma arvore */
 TreeNode *removeRoot (TreeNode *r) {
     TreeNode *p, *q;
     
-    /* Caso nao haja filhos na esquerda */
-    if (r->esq == NULL) 
+    /* Caso nao haja filhos a esquerda, nova raiz sera a subarvore direita */
+    if (r->esq == NULL)
         q = r->dir;
     
-    /* Caso haja filho na esquerda, encontra antecessor para ser a nova raiz */
+    /* Caso haja filho na esquerda, encontra predecessor para ser a nova raiz */
     else {
         p = r;
         q = r->esq;
@@ -145,7 +137,7 @@ TreeNode *removeRoot (TreeNode *r) {
             q = q->dir;
         }
         
-        /* Caso a nova raiz nao seja o filho a esquerda da raiz */
+        /* Caso a nova raiz nao seja o filho direto da raiz */
         if (p != r) {
             p->dir = q->esq;
             q->esq = r->esq;
@@ -159,6 +151,7 @@ TreeNode *removeRoot (TreeNode *r) {
     return q;
 }
 
+/* Retorna um candidato para realizar o afunilamento */
 int findNewRoot (TreeNode *r) {
     TreeNode *p;
     
@@ -166,12 +159,8 @@ int findNewRoot (TreeNode *r) {
     if (r == NULL || (r->esq == NULL && r->dir == NULL))
         return NOT_FOUND;
     
-#ifdef DEBUG
-//         printf("Finding the new root now...\n");
-#endif
-
-    
-    /* Caso nao haja esquerda, encontra o menor elemento da subarvore direita */
+    /* Caso nao haja subarvore esquerda, encontra o menor elemento 
+     * da subarvore direita */
     if (r->esq == NULL) {
         r = r->dir;
         while (r != NULL) {
@@ -179,8 +168,7 @@ int findNewRoot (TreeNode *r) {
             r = r->esq;
         }
     }   
-    /* Caso haja apenas esquerda ou ambos, encontra o maior elemento da
-     * esquerda */
+    /* Caso haja subarvore esquerda, encontra o seu maior elemento */
     else {
         r = r->esq;
         while (r != NULL) {
@@ -190,113 +178,102 @@ int findNewRoot (TreeNode *r) {
     }
     
     return p->elem;
-       
 }
 
-/* Retorna se o elemento buscado existe na arvore */
+/* Retorna se o elemento "n" existe na arvore */
 int buscaTree (TreeNode *r, int n) {
-    if (!r)
-        return 0;
-    
-    if (n == r->elem)
+    while (r && r->elem != n)
+        if (r->elem > n)
+            r = r->esq;
+        else
+            r = r->dir;
+        
+    if (r)
         return 1;
-    
-    if (r->elem > n)
-        return buscaTree(r->esq, n);
     else
-        return buscaTree(r->dir, n);
+        return 0;
 }
 
+/* Realiza o afunilamento com o elemento "newR" na arvore, supoe-se
+ * que o elemento exista na arvore */
 TreeNode* afunilamento (TreeNode *r, int newR) {
     TreeNode *a = r, *p = NULL, *n = NULL;
     
-    /* Caso a raiz seja o próprio elemento ou esteja vazia */
+    /* Caso a raiz seja o proprio elemento ou a arvore esteja vazia */
     if (a == NULL || a->elem == newR)
         return a;
-    else if (newR > a->elem)
-        p = a->dir;
+    /* Caso o elemento esteja a esquerda do avo */
     else if (newR < a->elem)
         p = a->esq;
-
-    if (newR > p->elem)
-        n = p->dir;
-    else if (newR < p->elem)
-        n = p->esq;
-    /* Caso o proprio pai seja o elemento, finaliza */
+    /* Ou a direita */
     else
-        /* Caso esteja a esquerda do pai */
+        p = a->dir;
+
+    /* Caso o elemento esteja a direita do pai */
+    if (newR < p->elem)
+        n = p->esq;
+    /* Ou a direita */
+    else if (newR > p->elem)
+        n = p->dir;
+    /* Caso o pai seja o proprio elemento, finaliza */
+    else {
+        /* Caso esteja a esquerda do avo */
         if (newR < a->elem)
             return RD(a);
-        /* Caso esteja a direita do pai */
-        else if (newR > a->elem)
+        /* Ou a direita */
+        else
             return RE(a);
-    
-    /* Caso o filho nao seja o elemento desejado, continua a procura-lo */
-    if (newR != n->elem) {
-        n = afunilamento(p, newR);
-        p = n;
-        
-        if (newR > a->elem) {
-            a->dir = p;
-        }
-        else if (newR < a->elem) {
-            a->esq = p;
-        }
-        
-        if (p->elem != newR) {
-            if (newR > p->elem)
-                return p->dir;
-            else
-                return p->esq;
-        }
-//         printf("apos o afunilamento, o n vale %d, ", n->elem);
     }
     
-//     printf("valor de n found: %d = %d\n", n->elem, newR);
+    /* Caso o filho ainda nao seja o elemento desejado, continua a percorrer 
+     * a arvore para encontra-lo */
+    if (newR != n->elem) {
+        /* Realiza o afunilamento a partir do pai */
+        p = afunilamento(p, newR);
+        
+        /* Finaliza a arvore, caso o pai esteja a esquerda do avo */
+        if (newR < a->elem) {
+            a->esq = p;
+            return RD(a);
+        }
+        /* Ou a direita */
+        else if (newR > a->elem) {
+            a->dir = p;
+            return RE(a);
+        }
+    }
     
-    /* Encontrado o elemento, executa caso esteja a esquerda do pai */
+    /* Encontrado o elemento no filho, executa caso esteja a esquerda do pai */
     if (n->elem < p->elem) {
         /* Caso esteja a esquerda do avo */
         if (p->elem < a->elem) {
-//             printf("vo %d e ", a->elem);
             a = RD(a);
-//             printf("E-E: %d ", a->elem);
             return RD(a);
         }
         /* Caso esteja a direita do avo */
         else if (p->elem > a->elem) {
             a->dir = RD(p);
-//             printf("E-D: %d ", a->elem);
             return RE(a);
         }
     }
-    /* Caso esteja a direita do pai */ 
+    /* Ou a direita do pai */ 
     else if (n->elem > p->elem) {
         /* Caso esteja a esquerda do avo */
         if (p->elem < a->elem) {
             a->esq = RE(p);
-//             printf("D-E: %d ", a->elem);
             return RD(a);
         }
         /* Caso esteja a direita do avo */
         else if (p->elem > a->elem) {
             a = RE(a);
-//             printf("D-D: %d ", a->elem);
             return RE(a);
         }
     }
-    else if (n->elem == p->elem) {
-        /* Caso esteja a esquerda do pai */
-        if (newR < a->elem)
-            return RD(a);
-        /* Caso esteja a direita do pai */
-        else if (newR > a->elem)
-            return RE(a);
-    }
-    
+
     return NULL;
 }
 
+/* Rotaciona em "r" para a esquerda */
 TreeNode* RE (TreeNode *r) {
     TreeNode *t = r->dir;
     
@@ -308,6 +285,7 @@ TreeNode* RE (TreeNode *r) {
     return t;
 }
 
+/* Rotaciona em "r" para a direita */
 TreeNode* RD (TreeNode *r) {
     TreeNode *t = r->esq;
     
@@ -319,16 +297,18 @@ TreeNode* RD (TreeNode *r) {
     return t;
 }
 
-void freeTree (TreeNode *p) {
-    if (!p)
+/* Libera a memoria de uma arvore */
+void freeTree (TreeNode *r) {
+    if (!r)
         return;
     
-    freeTree(p->esq);
-    freeTree(p->dir);
+    freeTree(r->esq);
+    freeTree(r->dir);
     
-    free(p);
+    free(r);
 }
 
+/* Retorna o no de uma lista ligada */
 ListNode* createListNode(TreeNode *s, int order) {
     ListNode *p;
     
@@ -347,11 +327,11 @@ ListNode* removeListNode (ListNode *p) {
     
     t = p->next;
     p->next = t->next;
-//     printf("*********************removo o S%d\n", t->order);
     
     return t;
 }
 
+/* Libera a memoria de uma lista */
 void freeList (ListNode *p) {
     ListNode *t;
     

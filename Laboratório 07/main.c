@@ -1,6 +1,10 @@
+/* Isadora Sophia Garcia Rodopoulos
+ * RA: 158018
+ * MC202B - LAB07 - Cobertura de Conjuntos */
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <string.h>
 #include "cobertura.h"
 
 int main () {
@@ -10,7 +14,7 @@ int main () {
     
     scanf("%d %d", &u, &n);
     
-    /* Inicia o universo U */    
+    /* Inicia o universo U */
     for (i = 1; i <= u; i++)
         U = insereTreeNode(U, i);
     
@@ -23,6 +27,8 @@ int main () {
         aux = aux->next;
     }
     
+    /* Caso o metodo guloso tenha sido bem sucedido, imprime os
+     * conjuntos escolhidos */
     if (guloso(R, U, S)) {
         while (R->next) {
             aux = R;
@@ -36,6 +42,7 @@ int main () {
             else
                 printf(":)\n");
         }
+    /* Caso o metodo guloso nao tenha sido bem sucedido */
     } else
         printf(":(\n");
         

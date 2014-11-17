@@ -2,21 +2,26 @@
 
 #define MAX_NUMBER_LENGTH 11
 
+/* Prototipos de funcoes auxiliares para a biblioteca */
 int removeIntersecao (TreeNode **p, TreeNode *beGone);
 ListNode *findMaxSub (ListNode *S);
 
+/* Retorna um subconjunto recebido na entrada */
 ListNode* leConjunto (int order) {
     char number[MAX_NUMBER_LENGTH], end;
     ListNode *S;
     
     getchar();
     
+    /* Realiza a leitura do numero */
     scanf("%s%c", number, &end);
     
-    S = createListNode(createTreeNode(atoi(number)), order);
+    /* Aloca-o na arvore, acrescentando o seu tamanho */
+    S = createListNode(createTree(atoi(number)), order);
     S->size++;
     
-    while (end != '\n') {        
+    /* Realiza o mesmo procedimento para todos os elementos do subconjunto */
+    while (end != '\n') {
         scanf ("%s%c", number, &end);
        
         S->s = insereTreeNode(S->s, atoi(number));
@@ -26,7 +31,7 @@ ListNode* leConjunto (int order) {
     return S;
 }
 
-/* Retorna se o metodo guloso foi reealizado com sucesso */
+/* Retorna se o metodo guloso foi realizado com sucesso */
 int guloso(ListNode *R, TreeNode *U, ListNode *S) {
     ListNode *maxSub, *aux;
     
@@ -34,61 +39,55 @@ int guloso(ListNode *R, TreeNode *U, ListNode *S) {
         /* Seleciona e remove o conjunto de maior quantidade 
          * de elementos em U */
         maxSub = removeListNode(findMaxSub(S));
-        
-#ifdef DEBUG
-        printf("Next step: removing the interception of S with S%d\n", maxSub->order);
 
-        if (maxSub->order == 38)
-            printf("tamanho do 38 eh %d e o do 44 eh ", maxSub->size);
-#endif
         aux = S;
         
+        /* Realiza a leitura de todos os subconjuntos em S */
         while (aux->next != NULL) {
 #ifdef DEBUG
-//             printf("Removing interception with S%d\n", aux->next->order);
+            printf("Removing intersection of S%d in S%d\n",
+                    aux->next->order, maxSub->order);
 #endif
             
+            /* Remove a interseccao dos elementos dos subconjuntos de S 
+             * com maxSub */
             aux->next->size -= removeIntersecao(&(aux->next->s), maxSub->s);
             
-            /* Caso tenha esvaziado o conjunto */
-            if (!(aux->next->size)) {
-//                printf("removo o S%d\n", aux->next->order);
+            /* Caso o conjunto tenha sido esvaziado */
+            if (!(aux->next->size))
                 free(removeListNode(aux));
-//                 if (aux->next != NULL)
-//                     aux = aux->next;
-            }
             else
                 aux = aux->next;
         }
         
-#ifdef DEBUG
-//         printf("Next step: removing the interception with U\n");
-#endif
-        
+        /* Remove a interseccao de U com S */
         removeIntersecao(&U, maxSub->s);
         
+        /* Acrescenta subconjunto escolhido pela abordagem gulosa */
         R->next = createListNode(NULL, maxSub->order);
         R = R->next;
         
-        /* Remove subconjunto utilizado */
+        /* Remove o subconjunto utilizado */
         freeTree(maxSub->s);
         free(maxSub);
     }
     
-    /* Como nao usara mais os subconjuntos S... */
+    /* Libera a memoria dos subconjuntos de S */
     freeList(S);
     
     /* Caso o universo tenha sido esvaziado e a lista R seja valida */
     if (U == NULL)
         return 1;
    
-    /* Como nao foi possivel cobrir U... */
+    /* Libera a memoria do universo */
     freeTree(U);
     
+    /* ...o metodo nao foi realizado com sucesso */
     return 0;
 }
 
-/* Retorna quantos elementos foram eliminados de "p" */
+/* Elimina a intersecao dos elementos de "beGone" em "p" e retorna a
+ * quantidade eliminada */
 int removeIntersecao (TreeNode **p, TreeNode *beGone) {
     int removido = 0;
     
@@ -101,9 +100,6 @@ int removeIntersecao (TreeNode **p, TreeNode *beGone) {
         removido++;
     
     (*p) = removeTreeNode((*p), beGone->elem);
-//     printf("apos a remocao do %d:", beGone->elem);
-//     preOrder((*p));
-//     printf("\n");
     
     removido += removeIntersecao (p, beGone->esq);
     removido += removeIntersecao (p, beGone->dir);
@@ -111,7 +107,7 @@ int removeIntersecao (TreeNode **p, TreeNode *beGone) {
     return removido;
 }
 
-/* Retorna um no anterior ao de maior tamanho */
+/* Retorna o no anterior ao no de maior tamanho da lista */
 ListNode *findMaxSub (ListNode *S) {
     ListNode *max;
     
@@ -124,10 +120,6 @@ ListNode *findMaxSub (ListNode *S) {
        
         S = S->next;
     }
-    
-#ifdef DEBUG
-//     printf("Found the maxSub S%d\n", max->next->order);
-#endif
-    
+
     return max;
 }
