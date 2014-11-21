@@ -13,7 +13,7 @@ ListNode* leConjunto (int order) {
     ListNode *S;
     
     getchar();
-    
+
     /* Realiza a leitura do numero */
     scanf("%d%c", &number, &end);
     
@@ -101,6 +101,11 @@ int removeIntersecao (TreeNode **p, TreeNode *beGone) {
         removido++;
     
     (*p) = removeTreeNode((*p), beGone->elem);
+#ifdef DEBUG
+    printf(" - Pos afunilamento: ");
+    preOrder(*p);
+    printf("\n");
+#endif
     
     removido += removeIntersecao (p, beGone->esq);
     removido += removeIntersecao (p, beGone->dir);

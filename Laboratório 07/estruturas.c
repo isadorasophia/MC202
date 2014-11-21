@@ -74,6 +74,10 @@ TreeNode* removeTreeNode (TreeNode *r, int n) {
         newR = findNewRoot(r);
         r = removeRoot(r);
 
+#ifdef DEBUG
+        printf("Afunilando em %d: ", newR);
+        preOrder(r);
+#endif
         return afunilamento(r, newR);
     }
     
@@ -114,6 +118,11 @@ TreeNode* removeTreeNode (TreeNode *r, int n) {
      * realizar o afunilamento */
     if (!found || newR == NOT_FOUND)
         newR = p->elem;
+    
+#ifdef DEBUG
+    printf("Afunilando em %d: ", newR);
+    preOrder(r);
+#endif
 
     return afunilamento(r, newR);
 }
@@ -194,8 +203,7 @@ int buscaTree (TreeNode *r, int n) {
         return 0;
 }
 
-/* Realiza o afunilamento com o elemento "newR" na arvore, supoe-se
- * que o elemento exista na arvore */
+/* Realiza o afunilamento com o elemento "newR" na arvore */
 TreeNode* afunilamento (TreeNode *r, int newR) {
     TreeNode *a = r, *p = NULL, *n = NULL;
     
@@ -209,12 +217,22 @@ TreeNode* afunilamento (TreeNode *r, int newR) {
     else
         p = a->dir;
 
-    /* Caso o elemento esteja a direita do pai */
-    if (newR < p->elem)
+    /* Caso o elemento esteja a esquerda do pai */
+    if (newR < p->elem) {
+        /* Caso o filho ainda nao seja o elemento desejado, continua a
+         * percorrer a arvore para encontra-lo */
+        if (newR != p->esq->elem) {
+            p->esq = afunilamento(p->esq, newR);
+        }
         n = p->esq;
-    /* Ou a direita */
-    else if (newR > p->elem)
+    }
+    /* Ou a direita, realizando o procedimento analogo */
+    else if (newR > p->elem) {
+        if (newR != p->dir->elem) {
+            p->dir = afunilamento(p->dir, newR);
+        }
         n = p->dir;
+    }
     /* Caso o pai seja o proprio elemento, finaliza */
     else {
         /* Caso esteja a esquerda do avo */
@@ -223,24 +241,6 @@ TreeNode* afunilamento (TreeNode *r, int newR) {
         /* Ou a direita */
         else
             return RE(a);
-    }
-    
-    /* Caso o filho ainda nao seja o elemento desejado, continua a percorrer 
-     * a arvore para encontra-lo */
-    if (newR != n->elem) {
-        /* Realiza o afunilamento a partir do pai */
-        p = afunilamento(p, newR);
-        
-        /* Finaliza a arvore, caso o pai esteja a esquerda do avo */
-        if (newR < a->elem) {
-            a->esq = p;
-            return RD(a);
-        }
-        /* Ou a direita */
-        else if (newR > a->elem) {
-            a->dir = p;
-            return RE(a);
-        }
     }
     
     /* Encontrado o elemento no filho, executa caso esteja a esquerda do pai */
