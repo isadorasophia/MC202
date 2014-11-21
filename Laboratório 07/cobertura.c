@@ -8,23 +8,24 @@ ListNode *findMaxSub (ListNode *S);
 
 /* Retorna um subconjunto recebido na entrada */
 ListNode* leConjunto (int order) {
-    char number[MAX_NUMBER_LENGTH], end;
+    int number;
+    char end;
     ListNode *S;
     
     getchar();
     
     /* Realiza a leitura do numero */
-    scanf("%s%c", number, &end);
+    scanf("%d%c", &number, &end);
     
     /* Aloca-o na arvore, acrescentando o seu tamanho */
-    S = createListNode(createTree(atoi(number)), order);
+    S = createListNode(createTree(number), order);
     S->size++;
     
     /* Realiza o mesmo procedimento para todos os elementos do subconjunto */
     while (end != '\n') {
-        scanf ("%s%c", number, &end);
+        scanf ("%d%c", &number, &end);
        
-        S->s = insereTreeNode(S->s, atoi(number));
+        S->s = insereTreeNode(S->s, number);
         S->size++;
     }
     

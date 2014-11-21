@@ -9,8 +9,12 @@
 
 int main () {
     int u, n, i;
-    ListNode *S = createListNode(NULL, 0), *R = createListNode(NULL, 0), *aux;
+    ListNode *S, *R, *aux;
     TreeNode *U = NULL;
+    
+    /* Inicializa a cabeca das listas */
+    S = createListNode(NULL, 0);
+    R = createListNode(NULL, 0);
     
     scanf("%d %d", &u, &n);
     
