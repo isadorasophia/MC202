@@ -110,34 +110,8 @@ Node *find (int x, Node *tree, **s) {
     return found;
 }
 
-Node *cut (int a, *florest) {
-    Node *s, *nodeA, *parentS;
+Node *cut (int a, int b, *florest) {
     
-    nodeA = find(A, florest, &s);
-    
-    if (s) {
-        s->sibling = nodeA->sibling;
-    }
-    else if (nodeA->parent) {
-        nodeA->parent->child = nodeA->sibling;
-    }
-    /* It was already on top of the vertex */
-    else
-        return florest;
-
-    nodeA->sibling = NULL;
-    
-    parentS = nodeA->parent;
-    
-    while (parentS) {
-        nodeA->parent = parentS;
-        parentS = parentS->sibling;
-    }
-    
-    parentS->sibling = nodeA;
-    nodeA->parent = parentS->parent;
-    
-    return florest;
 }
 
 
@@ -148,7 +122,8 @@ int lca (int A, int B, Node* florest) {
     nodeA = find(A, florest, &s);
     
     nodeB = find(B, florest, &s);
-
+    
+    /* Assumes that B -> A */
     ancestor = findAncestor(nodeA, nodeB);
     
     return ancestor;

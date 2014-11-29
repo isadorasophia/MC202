@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Tree {
+    int parent;
+    int height;
+}
+
+void setFlorest (Tree *florest, int size);
+
+void link (int A, int B, Tree *florest);
+void cut (int A, Tree *florest);
+int lca (int A, int B, Tree *florest, int max);

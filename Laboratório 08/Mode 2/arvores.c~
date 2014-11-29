@@ -1,0 +1,50 @@
+#include "arvores.h"
+
+#define NO_PARENT 0
+#define FAILED -1
+
+int findCommonAncestor (int A, int B, Tree *florest, int max);
+
+/* Return N trees linked to a single vertex, as they have no parent */
+void setFlorest (Tree florest[], int size) {
+    int i;
+    
+    for (i = 0; i < size; i++) {
+        florest[i].parent = NO_PARENT;
+        florest[i].height = 0;
+    }
+}
+
+void link (int A, int B, Tree *florest) {
+    florest[A].parent = B;
+    florest[A].height = florest[florest[A].parent].height + 1;
+}
+
+void cut (int A, Tree *florest) {
+    florest[A].parent = florest[florest[A].parent].parent;
+    florest[A].height--;
+}
+
+int lca (int A, int B, Tree *florest, int max) {
+    if (florest[B].height > florest[A].height)
+        return findCommonAncestor(B, A, florest, max);
+    else
+        return findCommonAncestor(A, B, florest, max);
+}
+
+int findCommonAncestor (int A, int B, Tree *florest, int max) {
+    if (A <= 0 || B <= 0 || A > max || B > max)
+        return FAILED;
+    if (A == B)
+        return A;
+    
+    int ancestor;
+    
+    ancestor = findCommonAncestor (florest[A].parent, B, florest, max);
+    
+    if (ancestor == FAILED) {
+        ancestor = findCommonAncestor (A, florest[B].parent, florest, max);
+    }
+    
+    return ancestor;
+}

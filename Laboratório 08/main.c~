@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "arvores.h"
+
+#define MAX_LENGHT 4
+
+int main () {
+    char[MAX_LENGHT] operation;
+    int N, M;
+    Node *florest;
+    
+    scanf("%d %d", &N, &M);
+    
+    /* Create N trees linked to a single vertex */
+    florest = initializeTrees(N);
+    
+    while (N--) {
+        scanf("%s", operation);
+        
+        
+    }
+    
+    return 0;
+}
