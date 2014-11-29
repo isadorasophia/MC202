@@ -20,4 +20,4 @@ void link (int A, int B, Tree *florest, int size);
 void cut (int A, Tree *florest, int size);
 
 /* Find the lowest common ancestor between A and B */
-int lca (int A, int B, Tree *florest, int max);
+int lca (int A, int B, Tree *florest);

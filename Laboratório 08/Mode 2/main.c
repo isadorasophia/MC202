@@ -27,7 +27,7 @@ int main () {
         if (strcmp(operation, "lca") == 0) {
             scanf("%d %d", &a, &b);
             
-            printf("%d\n", lca(a, b, florest, N + 1));
+            printf("%d\n", lca(a, b, florest));
         }
         else if (strcmp(operation, "link") == 0) {
             scanf("%d %d", &a, &b);

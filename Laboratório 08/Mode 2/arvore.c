@@ -5,7 +5,6 @@
 
 /* Prototypes of functions that help to implement the library */
 void setHeight(int A, Tree *florest, int size);
-int findCommonAncestor (int A, int B, Tree *florest, int max);
 
 /* Return N trees linked to a single vertex */
 void setFlorest (Tree florest[], int size) {
@@ -46,48 +45,20 @@ void cut (int A, Tree *florest, int size) {
 }
 
 /* Find the lowest common ancestor between A and B */
-int lca (int A, int B, Tree *florest, int max) {   
-    /* Study the current condition in order to return the lowest ancestor in
-     * the most optimized way - if A is lower than B */
-    if (florest[B].height < florest[A].height)
-        return findCommonAncestor(A, B, florest, max);
-    /* ...otherwise */
-    else
-        return findCommonAncestor(B, A, florest, max);
-}
-
-/* Find the common ancestor between A and B */
-int findCommonAncestor (int A, int B, Tree *florest, int max) {
-    /* Escaped the limits, or it won't find anyway */
-    if (A <= 0 || B <= 0 || florest[B].height > florest[A].height) 
-        return FAILED;
-    /* Found */
-    if (A == B)
-        return A;
+int lca (int A, int B, Tree *florest) {   
+    /* Check who is the lower one, and goes up until they reach the same
+     * height */
+    while (florest[A].height > florest[B].height)
+        A = florest[A].parent;
+    while (florest[A].height < florest[B].height)
+        B = florest[B].parent;
     
-    /* Default is failed */
-    int firstEntry = FAILED, secondEntry = FAILED;
-   
-    /* Way up to B! */
-    firstEntry = findCommonAncestor (florest[A].parent, B, florest, max);
-
-    printf("im testing");
-    /* Way up to A! */
-    secondEntry = findCommonAncestor (A, florest[B].parent, florest, max);
-
-    /* If both entries are valid */
-    if (secondEntry != FAILED && firstEntry != FAILED) {
-        /* If the second entry is lower than the first one */
-        if (florest[secondEntry].height > florest[firstEntry].height)
-            return secondEntry;
-        /* ...otherwise */
-        else
-            return firstEntry;
+    /* Now that they have the same height - just run until find the
+     * common ancestor */
+    while (A != B) {
+        A = florest[A].parent;
+        B = florest[B].parent;
     }
-    /* If only the second entry was valid */
-    else if (secondEntry != FAILED)
-        return secondEntry;
-    /* Or if only the first one */
-    else
-        return firstEntry;
+    
+    return A;
 }
