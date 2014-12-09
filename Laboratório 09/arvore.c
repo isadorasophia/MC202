@@ -91,7 +91,6 @@ void arvore23_insere(arvore23_t **t, int chave)
                     nodeFound = 1;
                     
                     goesUp = target->chave1;
-                    
                     target->chave1 = chave;
                     
                     /* Divide a folha */
@@ -129,7 +128,7 @@ void arvore23_insere(arvore23_t **t, int chave)
                 }
             }
             
-            /* Se a chave for o maior elemento */
+            /* ...ou se a chave for o maior elemento */
             else {
                 /* Nao eh um no folha, continua a percorrer */
                 if (target->filho3) {
@@ -142,6 +141,7 @@ void arvore23_insere(arvore23_t **t, int chave)
                     
                     goesUp = target->chave2;
                     
+                    /* Divide a folha */
                     filhoUp = (arvore23_t *) malloc(sizeof(arvore23_t));
                     filhoUp->nchaves = 1;
                     filhoUp->chave1 = chave;
@@ -154,10 +154,11 @@ void arvore23_insere(arvore23_t **t, int chave)
         }
     }
 
-    /* A partir do caso de um no folha lotado, encontra a regiao adequada
-     * para a insercao desta chave - estudando o target->pai */
+    /* A partir do caso de uma folha cheia, encontra a regiao adequada
+     * para a insercao desta chave */
     while (!located) {
-        /* Target->pai nao esta lotado - portanto, apropriado para a insercao */
+        /* O pai existe e nao esta cheio - e, portanto, apropriado para a
+         * insercao */
         if (target->pai && target->pai->nchaves == 1) {
             target = target->pai;
             located = 1;
@@ -170,7 +171,6 @@ void arvore23_insere(arvore23_t **t, int chave)
                 target->chave1 = goesUp;
                 target->chave2 = aux;
                
-                /* Assim, o filho 2 se torna o filho 3 */
                 target_aux = target->filho2;
                 target->filho2 = filhoUp;
                 target->filho3 = target_aux;
@@ -190,9 +190,9 @@ void arvore23_insere(arvore23_t **t, int chave)
             }
         }
         
-        /* Target->pai esta lotado, devem ser realizas mais divisoes */
+        /* ...ou caso o pai esteja cheio, ou mesmo nao exista */
         else {
-            /* Caso seja o menor elemento */
+            /* Caso haja um pai e seja o menor elemento */
             if (target->pai && goesUp < target->pai->chave1) {
                 target = target->pai;
                 
@@ -205,6 +205,7 @@ void arvore23_insere(arvore23_t **t, int chave)
                 target->filho2 = filhoUp;
                 target->filho2->pai = target;
                 
+                /* Divide o no */
                 filhoUp = (arvore23_t *) malloc(sizeof(arvore23_t));
                 filhoUp->nchaves = 1;
                 filhoUp->chave1 = target->chave2;
@@ -221,13 +222,14 @@ void arvore23_insere(arvore23_t **t, int chave)
                 target->nchaves--;
             }
             
-            /* ...ou caso seja o elemento intermediario */
+            /* Caso seja o elemento intermediario */
             else if (target->pai && goesUp > target->pai->chave1
                 && goesUp < target->pai->chave2) {
                 target = target->pai;
             
                 target_aux = filhoUp;
-                
+            
+                /* Divide o no */
                 filhoUp = (arvore23_t *) malloc(sizeof(arvore23_t));
                 filhoUp->nchaves = 1;
                 filhoUp->chave1 = target->chave2;
@@ -254,6 +256,7 @@ void arvore23_insere(arvore23_t **t, int chave)
                 
                 target_aux = filhoUp;
                 
+                /* Divide o no */
                 filhoUp = (arvore23_t *) malloc(sizeof(arvore23_t));
                 filhoUp->nchaves = 1;
                 filhoUp->chave1 = target->chave2;
@@ -270,7 +273,8 @@ void arvore23_insere(arvore23_t **t, int chave)
                 target->nchaves--;
             }
             
-            /* Caso tenha chegado ao no da raiz, cria uma nova raiz */
+            /* Caso nao haja mais um pai - ou seja, tenha chegado ao no raiz.
+             * Cria-se uma nova raiz */
             if (target == *t) {                
                 located = 1;
                 
